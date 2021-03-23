@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, TouchableWithoutFeedback } from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome'
 
 import moment from 'moment'
@@ -10,7 +10,7 @@ import commonStyles from '../commonStyles'
 export default props => {
 
     //para colocar um risco no nome da tarefa CONCLUIDA
-    const doneOrNotStyle = props.doneAt != null ? 
+    const doneOrNotStyle = props.doneAt != null ?
         { textDecorationLine: 'line-through' } : {}
 
     //se estiver concluido ele coloca a data que foi concluida, se não vai por a data estimada
@@ -21,9 +21,12 @@ export default props => {
 
     return (
         <View style={style.container}>
-            <View style={style.checkContainer}>
-                {getCheckView(props.doneAt)}
-            </View>
+            <TouchableWithoutFeedback
+                onPress={() => props.toggleTask(props.id)}>
+                <View style={style.checkContainer}>
+                    {getCheckView(props.doneAt)}
+                </View>
+            </TouchableWithoutFeedback>
 
             <View>
                 <Text style={[style.desc, doneOrNotStyle]}>{props.desc}</Text>
@@ -35,7 +38,7 @@ export default props => {
 }
 
 function getCheckView(doneAt) {
-    if(doneAt != null){
+    if (doneAt != null) {
         return (
             <View style={style.done}>
                 <Icon name='check' size={20} color='#FFF'></Icon>
@@ -43,8 +46,8 @@ function getCheckView(doneAt) {
         )
     } else {
         return (
-            <View style={style.peding}> 
-                
+            <View style={style.peding}>
+
             </View>
         )
     }
@@ -62,7 +65,7 @@ const style = StyleSheet.create({
         width: '20%',
         alignItems: 'center',
         justifyContent: 'center'
-        
+
     },
     peding: { //para ficar uma bola perfeita
         height: 25,
@@ -82,7 +85,7 @@ const style = StyleSheet.create({
     desc: { //descrição
         fontFamily: commonStyles.fontFamily,
         color: commonStyles.colors.mainText,
-        fontSize: 18,        
+        fontSize: 18,
     },
     date: {
         fontFamily: commonStyles.fontFamily,
