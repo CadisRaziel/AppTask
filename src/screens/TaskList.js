@@ -17,7 +17,7 @@ export default class TaskList extends Component {
 
     state = {
         showDoneTasks: true, //caso o usuario clique no icone do "olho" as tasks concluidas somem e se desclicar aparecem
-        showAddTasks: true,
+        showAddTasks: false,
         visibleTasks: [],
         tasks: [{
             id: Math.random(), 
@@ -71,26 +71,42 @@ export default class TaskList extends Component {
         const today = moment().locale('pt-br').format('ddd, D [de] MMM') //ddd = dia(segunda, terça ..), D = Dia do mes(1,2,3) [algo que quero escrever], MMM = mês(novembro, dezembro...)
         return (
             <View style={style.container}>
+
                 <AddTask isVisible={this.state.showAddTasks}
                     onCancel={() => this.setState({showAddTasks: false})}/> 
+
                 <ImageBackground source={todayImage}
                     style={style.bg}>
+
                         <View style={style.iconBar}>
+
                             <TouchableOpacity onPress={this.toggleFilter}>
                                 <Icon name={this.state.showDoneTasks ? 'eye' : 'eye-slash'} 
-                                    size={20} color={commonStyles.colors.secondary}/>
+                                    size={20} color={commonStyles.colors.secondary}/>                                    
                             </TouchableOpacity>
+
                         </View>
+
                         <View style={style.titleBar}>
                             <Text style={style.title}>Hoje</Text>
                             <Text style={style.subTitle}>{today}</Text>
                         </View>
+
                 </ImageBackground>
+
                 <View style={style.taskList}>
                     <FlatList data={this.state.visibleTasks}
                         keyExtractor={item => `${item.id}`}
                         renderItem={({item}) => <Task {...item} toggleTask={this.toggleTask} />} />
                 </View>
+
+                <TouchableOpacity style={style.addButton}
+                    activeOpacity={0.7}//para que o botão nao fique branco ao clicar, e sim com uma opacidade rasoavel
+                    onPress={() => this.setState({showAddTasks: true})}>
+                    <Icon name="plus" size={20} 
+                        color={commonStyles.colors.secondary}/>
+                </TouchableOpacity>
+
             </View>
         )
     }
@@ -129,6 +145,17 @@ const style = StyleSheet.create({
         marginHorizontal: 12,
         justifyContent: 'flex-end',
         marginTop: Platform.OS == 'ios' ? 40 : 10 //para que no iphone nao fique em cima do icone da hora e se for android da uma margin de 10
+    },
+    addButton: {
+        position: 'absolute',
+        right: 30,
+        bottom: 30,
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        backgroundColor: commonStyles.colors.today,
+        justifyContent: 'center',
+        alignItems: 'center'        
     }
 })
 

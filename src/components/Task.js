@@ -21,11 +21,14 @@ export default props => {
 
     return (
         <View style={style.container}>
+
             <TouchableWithoutFeedback
                 onPress={() => props.toggleTask(props.id)}>
+
                 <View style={style.checkContainer}>
                     {getCheckView(props.doneAt)}
                 </View>
+                
             </TouchableWithoutFeedback>
 
             <View>
