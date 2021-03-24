@@ -1,9 +1,13 @@
 import React, { Component } from 'react'
-import { Modal, View, StyleSheet, TouchableWithoutFeedback, Text, TouchableOpacity, TextInput, ToolbarAndroidBase} from 'react-native'
+import { Modal, View, StyleSheet, TouchableWithoutFeedback, 
+    Text, TouchableOpacity, TextInput, ToolbarAndroidBase, Platform} from 'react-native'
+
+import moment from 'moment'
+import DateTimePicker from '@react-native-community/datetimepicker' //lembrando que no ios temos que ver a aula 130
 
 import commonStyles from '../commonStyles'
 
-const initialState = { desc: '' }
+const initialState = { desc: '', date: new Date(), showDatePicker: false }
 
 export default class AddTask extends Component {
 
@@ -11,6 +15,47 @@ export default class AddTask extends Component {
         ...initialState
     }
 
+    //função para salvar a tarefa
+    save = () => {
+        const newTask = {
+            desc: this.state.desc,
+            date: this.state.date
+        }
+
+        //se onSave estiver setado(verdadeiro) ele vai chamar o onSave(newTask)
+        this.props.onSave && this.props.onSave(newTask)
+        this.setState({...initialState})
+
+    }
+
+    //função para incluir datas no IOS e no ANDROID (essa função de data é diferente nos dois) 
+    //no IOS quando coloco essa função ele <DateTimePicker> somente ela é capaz de renderizar no IOS
+    //No android eu ja tenho que por um let e fazer todo o resto abaixo (lembrando que fazendo isso nao muda nada no IOS)
+    //{this.state.showDatePicker && datePicker} = datePicker só sera interpretada se isso showDatePicker for verdadeiro (forma de renderizar algo condicional !!)
+    getDatePicker = () => {
+        let datePicker =  <DateTimePicker value={this.state.date} 
+                onChange={(_, date) => this.setState({date, showDatePicker: false})}
+                mode='date' display='calendar'/>
+
+        //gerar a data em string
+        const dateString = moment(this.state.date).format('dddd, D [de] MMMM [de] YYYY')
+
+        //se for android vai substituir por essa View
+        if(Platform.OS === 'android') {
+            datePicker = (
+                <View>
+                    <TouchableOpacity onPress={() => this.setState({showDatePicker: true})}>
+                        <Text style={style.date}>
+                            {dateString}
+                        </Text>
+                    </TouchableOpacity>
+                    {this.state.showDatePicker && datePicker}
+                </View>
+            )
+        }
+
+        return datePicker
+    }
 
     render(){
         return (
@@ -29,6 +74,8 @@ export default class AddTask extends Component {
                         placeholder="Informe a descrição..."
                         onChangeText={desc => this.setState({ desc })} 
                         value={this.state.desc}/>
+                        
+                    {this.getDatePicker()}
 
                     <View style={style.buttons}>
                         <TouchableOpacity onPress={this.props.onCancel}>
@@ -36,7 +83,8 @@ export default class AddTask extends Component {
                         </TouchableOpacity>
 
                         <TouchableOpacity>
-                            <Text style={style.button}>Salvar</Text>
+                            <Text onPress={this.save}
+                             style={style.button}>Salvar</Text>
                         </TouchableOpacity>
                     </View>
 
@@ -84,7 +132,19 @@ const style = StyleSheet.create({
         margin: 20,
         marginRight: 30,        
         color: commonStyles.colors.today        
+    },
+    date: {
+        fontFamily: commonStyles.fontFamily,
+        fontSize: 20,
+        marginLeft: 15
     }
 })
 
 //TouchableWithoutFeedback = qunado clicar nele, ele chama uma função
+
+
+
+ //função para incluir datas no IOS e no ANDROID (essa função de data é diferente nos dois)
+    //no IOS quando coloco essa função ele //função para incluir datas no IOS e no ANDROID (essa função de data é diferente nos dois)
+
+//{this.state.showDatePicker && datePicker}

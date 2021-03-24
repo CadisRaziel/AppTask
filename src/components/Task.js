@@ -1,5 +1,6 @@
 import React from 'react'
-import { View, Text, StyleSheet, TouchableWithoutFeedback } from 'react-native'
+import { View, Text, StyleSheet, TouchableWithoutFeedback, TouchableOpacity } from 'react-native'
+import Swipeable from 'react-native-gesture-handler/Swipeable'
 import Icon from 'react-native-vector-icons/FontAwesome'
 
 import moment from 'moment'
@@ -19,24 +20,50 @@ export default props => {
     const formattedDate = moment(date).local('pt-br')
         .format('ddd, D [de] MMMM')
 
+    //const function para ativar o "renderRightActions", quand o usuario arrastar para o lado esquerdo aparece o icone do lixo para ele clicar
+    const getRightContent = () => {
+        return (
+            <TouchableOpacity style={style.right}
+                onPress={() => props.onDelete && props.onDelete(props.id)}>                
+                <Icon name="trash" size={30} color='#FFF' />
+            </TouchableOpacity>
+        )
+    }
+
+    //quando o usuario arrastar para o lado direito vai excluir direto sem precisar clicar no icone
+    const getLeftContent = () => {
+        return (
+            <View style={style.left}>
+                <Icon name="trash" size={20} color='#FFF' style={style.excludeIcon} />
+                <Text style={style.excludeText}>Excluir</Text>
+            </View>
+        )
+    }
+
     return (
-        <View style={style.container}>
+        <Swipeable renderRightActions={getRightContent}
+                   renderLeftActions={getLeftContent}
+                   onSwipeableLeftOpen={() => props.onDelete && props.onDelete(props.id)}>
 
-            <TouchableWithoutFeedback
-                onPress={() => props.toggleTask(props.id)}>
+            <View style={style.container}>
 
-                <View style={style.checkContainer}>
-                    {getCheckView(props.doneAt)}
+                <TouchableWithoutFeedback
+                    onPress={() => props.toggleTask(props.id)}>
+
+                    <View style={style.checkContainer}>
+                        {getCheckView(props.doneAt)}
+                    </View>
+
+                </TouchableWithoutFeedback>
+
+                <View>
+                    <Text style={[style.desc, doneOrNotStyle]}>{props.desc}</Text>
+                    <Text style={style.date}>{formattedDate}</Text>
                 </View>
-                
-            </TouchableWithoutFeedback>
 
-            <View>
-                <Text style={[style.desc, doneOrNotStyle]}>{props.desc}</Text>
-                <Text style={style.date}>{formattedDate}</Text>
             </View>
 
-        </View>
+        </Swipeable>
     )
 }
 
@@ -62,7 +89,8 @@ const style = StyleSheet.create({
         borderColor: '#AAA', //cor da borda
         borderBottomWidth: 1, //grossura da borada
         alignItems: 'center', //para alinhar no centro
-        paddingVertical: 10 //para dar um espaçamento tanto em cima quanto embaixo
+        paddingVertical: 10, //para dar um espaçamento tanto em cima quanto embaixo
+        backgroundColor: '#FFF' //NÃO ESQUECER DE COLOCAR ESSE BACKGROUND POIS SE NAO NA HORA DE ARRASTAR PRA EXCLUIR FICA UMA COISA EM CIMA DA OUTRA
     },
     checkContainer: {
         width: '20%',
@@ -76,7 +104,7 @@ const style = StyleSheet.create({
         borderRadius: 13,
         borderWidth: 1, //largura da borda
         borderColor: '#555'
-    },
+    }, 
     done: {
         height: 25,
         width: 25,
@@ -94,6 +122,28 @@ const style = StyleSheet.create({
         fontFamily: commonStyles.fontFamily,
         color: commonStyles.colors.subText,
         fontSize: 12
+    },
+    right: {
+        backgroundColor: 'red',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        paddingHorizontal: 20,
+    },
+    left: {
+        flex: 1, //para que a hora que arrastar para o lado direito quando atingir 50% ele corra sozinho ate o final(o excluir)
+        backgroundColor: 'red',
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    excludeIcon: {
+        marginLeft: 10,
+    },
+    excludeText: {
+        fontFamily: commonStyles.fontFamily,
+        color: '#FFF',
+        fontSize: 20,
+        margin: 10
     }
 })
 
@@ -102,3 +152,9 @@ const style = StyleSheet.create({
 // props.estimateAt = data estimada
 // props.doneAt = concluido em
 //<Text style={[style.desc, doneOrNotStyle]}> para conseguirmos por mais de um style temos que colocar {[]}
+
+
+//Swipeable = para voce poder clicar e segurar a tarefa e arrastar para o lado e ela excluir "No caso vamos escolher o lado direito"
+
+
+//onSwipeableLeftOpen={() => props.onDelete && props.onDelete(props.id)}> a hora que ele clica e arrasta pro lado direito vai realizar a exclusao
