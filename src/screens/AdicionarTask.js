@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Modal, View, StyleSheet, TouchableWithoutFeedback, 
     Text, TouchableOpacity, TextInput, ToolbarAndroidBase, Platform} from 'react-native'
+    
 
 import moment from 'moment'
 import DateTimePicker from '@react-native-community/datetimepicker' //lembrando que no ios temos que ver a aula 130
@@ -33,9 +34,14 @@ export default class AddTask extends Component {
     //No android eu ja tenho que por um let e fazer todo o resto abaixo (lembrando que fazendo isso nao muda nada no IOS)
     //{this.state.showDatePicker && datePicker} = datePicker só sera interpretada se isso showDatePicker for verdadeiro (forma de renderizar algo condicional !!)
     getDatePicker = () => {
-        let datePicker =  <DateTimePicker value={this.state.date} 
-                onChange={(_, date) => this.setState({date, showDatePicker: false})}
-                mode='date' display='calendar'/>
+        let datePicker =  <DateTimePicker
+        mode="date"
+        value={this.state.date}
+        onChange={(_, date) => {
+          date = date ? date : new Date()
+          this.setState({date, showDatePicker: false})
+        }} />
+                
 
         //gerar a data em string
         const dateString = moment(this.state.date).format('dddd, D [de] MMMM [de] YYYY')
@@ -148,3 +154,18 @@ const style = StyleSheet.create({
     //no IOS quando coloco essa função ele //função para incluir datas no IOS e no ANDROID (essa função de data é diferente nos dois)
 
 //{this.state.showDatePicker && datePicker}
+
+
+//assim estava dando erro !! (quando eu abria o calendario e dava cancel e tentava abrir de novo dava um erro na "value")
+{/* <DateTimePicker mode='date' value={this.state.date} 
+                onChange={(_, date) => this.setState({date, showDatePicker: false})} */}
+
+
+                //no github eu achei esse codigo e resolveu o problema do value(aparentemente a função estava errada)
+                // let datePicker =  <DateTimePicker
+                // mode="date"
+                // value={this.state.date}
+                // onChange={(_, date) => {
+                //   date = date ? date : new Date()
+                //   this.setState({date, showDatePicker: false})
+                // }} />
